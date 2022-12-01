@@ -41,16 +41,16 @@ class DepthToSpaceConfigTemplate(hls4ml.backends.template.LayerConfigTemplate):
     def __init__(self):
         super().__init__(DepthToSpace)
         self.template = depthtospace_config_template
-    
+
     def format(self, node):
-        params = self._default_config_params(node)        
+        params = self._default_config_params(node)
         return self.template.format(**params)
 
 class DepthToSpaceFunctionTemplate(hls4ml.backends.template.FunctionCallTemplate):
     def __init__(self):
         super().__init__(DepthToSpace, include_header=depthtospace_include_list)
         self.template = depthtospace_function_template
-    
+
     def format(self, node):
         params = self._default_function_params(node)
         return self.template.format(**params)
@@ -82,16 +82,16 @@ class UpsampleConfigTemplate(hls4ml.backends.template.LayerConfigTemplate):
     def __init__(self):
         super().__init__(Upsample)
         self.template = upsample_config_template
-    
+
     def format(self, node):
-        params = self._default_config_params(node)        
+        params = self._default_config_params(node)
         return self.template.format(**params)
 
 class UpsampleFunctionTemplate(hls4ml.backends.template.FunctionCallTemplate):
     def __init__(self):
         super().__init__(Upsample, include_header=upsample_include_list)
         self.template = upsample_function_template
-    
+
     def format(self, node):
         params = self._default_function_params(node)
         return self.template.format(**params)
@@ -120,7 +120,7 @@ def parse_lambda_layer(keras_layer, input_names, input_shapes, data_reader, conf
         layer['height'] = inp0[-3]
     else:
         layer['class_name'] = 'Activation'
-        layer['activation'] = 'Linear'
+        layer['activation'] = 'linear'
         if input_names is not None:
             layer['inputs'] = input_names
 
