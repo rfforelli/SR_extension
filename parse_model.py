@@ -120,7 +120,7 @@ def parse_lambda_layer(keras_layer, input_names, input_shapes, data_reader, conf
         layer['height'] = inp0[-3]
     else:
         layer['class_name'] = 'Activation'
-        layer['activation'] = 'Linaer'
+        layer['activation'] = 'Linear'
         if input_names is not None:
             layer['inputs'] = input_names
 
@@ -162,8 +162,9 @@ def parse_model():
     hls_model = hls4ml.converters.convert_from_keras_model(model,
                                                            hls_config = config,
                                                            io_type = 'io_stream',
-                                                            output_dir = 'test_model'
+                                                           output_dir = 'test_model'
                                                            )
+    hls_model.compile()
 
 if __name__ == "__main__":
     parse_model()
