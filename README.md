@@ -4,9 +4,18 @@ This example shows how to use the hls4ml's **extensions API** to parse the `SR_M
 
 Look specifically at [parse_model.py](parse_model.py). The path to the model might need editing (`MODEL`) and should point to a local copy of [best_status](https://github.com/fastmachinelearning/SR_Mobile_Quantization/tree/sandbox/experiment/base7_D4C28_bs16ps64_lr1e-3/best_status).
 
-To run:
+To run hls4ml with the Extension API:
 ```
 make run
+```
+
+## Validation
+
+Compile and run the generated C++/HLS specification for the SR model:
+```
+cd csim
+make run
+make show-image
 ```
 
 ## Lambda layer implementation

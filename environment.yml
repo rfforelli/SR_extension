@@ -7,6 +7,7 @@ dependencies:
   - pydot
   - graphviz
   - pip
+  - opencv
   - pip:
     - jupyter
     - tensorflow==2.9.1

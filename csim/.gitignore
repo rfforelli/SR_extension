@@ -1,0 +1,6 @@
+myproject
+*.d
+*.o
+*.dat
+*.jpg
+*.log
