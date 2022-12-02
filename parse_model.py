@@ -126,7 +126,7 @@ def parse_lambda_layer(keras_layer, input_names, input_shapes, data_reader, conf
 
     return layer, [shape for shape in input_shapes[0]]
 
-def regsister_lambda_layer():
+def register_lambda_layer():
     # Register the converter for custom Keras layer
     hls4ml.converters.register_keras_layer_handler('Lambda', parse_lambda_layer)
 
@@ -142,11 +142,11 @@ def regsister_lambda_layer():
     backend.register_template(DepthToSpaceConfigTemplate)
     backend.register_template(DepthToSpaceFunctionTemplate)
 
-    backend.register_source(test_root_path / "nnet_depthtospace_stream.h")
-    backend.register_source(test_root_path / "nnet_upsample_stream.h")
+    backend.register_source(test_root_path / "lambda_cpp/nnet_depthtospace_stream.h")
+    backend.register_source(test_root_path / "lambda_cpp/nnet_upsample_stream.h")
 
 def parse_model():
-    regsister_lambda_layer()
+    register_lambda_layer()
 
     model = tf.keras.models.load_model(MODEL)
     model.summary()
