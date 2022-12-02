@@ -23,7 +23,7 @@ class DepthToSpace(hls4ml.model.layers.Layer):
         shape[-1] = shape[-1] // bs**2
         shape[-2] = shape[-2] * bs
         shape[-3] = shape[-3] * bs
-        dims = inp.dim_names
+        dims = ['OUT_HEIGHT_{}'.format(self.index), 'OUT_WIDTH_{}'.format(self.index), 'N_FILT_{}'.format(self.index)]
         self.add_output_variable(shape, dims)
 
 # HLS Templates
@@ -65,7 +65,7 @@ class Upsample(hls4ml.model.layers.Layer):
         inp = self.get_input_variable()
         shape = list(inp.shape)
         shape[-1] *= self.get_attr('scale2')
-        dims = inp.dim_names
+        dims = ['OUT_HEIGHT_{}'.format(self.index), 'OUT_WIDTH_{}'.format(self.index), 'N_FILT_{}'.format(self.index)]
         self.add_output_variable(shape, dims)
 
 # HLS Templates
