@@ -20,9 +20,9 @@ class DepthToSpace(hls4ml.model.layers.Layer):
         inp = self.get_input_variable()
         shape = list(inp.shape)
         bs = self.get_attr('block_size')
-        shape[-1] = shape[-1] // bs**2
-        shape[-2] = shape[-2] * bs
-        shape[-3] = shape[-3] * bs
+        shape[-1] //= bs**2
+        shape[-2] *= bs
+        shape[-3] *= bs
         dims = ['OUT_HEIGHT_{}'.format(self.index), 'OUT_WIDTH_{}'.format(self.index), 'N_FILT_{}'.format(self.index)]
         self.add_output_variable(shape, dims)
 
@@ -109,22 +109,30 @@ def parse_lambda_layer(keras_layer, input_names, input_shapes, data_reader, conf
         inp0 = input_shapes[0]
         layer['width'] = inp0[-2]
         layer['height'] = inp0[-3]
+        outshape = [shape for shape in input_shapes[0]]
+        outshape[-1] *= layer['scale2']
     elif layer['name'] == 'lambda_1':
         # this is the depth to space
         layer['class_name'] = 'DepthToSpace'
         layer['inputs'] = input_names
         inp0 = input_shapes[0]
-        layer['block_size'] = 3
+        bs = 3
+        layer['block_size'] = bs
         layer['n_chan'] = inp0[-1]
         layer['width'] = inp0[-2]
         layer['height'] = inp0[-3]
+        outshape = [shape for shape in input_shapes[0]]
+        outshape[-1] //= bs**2
+        outshape[-2] *= bs
+        outshape[-3] *= bs
+
     else:
         layer['class_name'] = 'Activation'
         layer['activation'] = 'linear'
         if input_names is not None:
             layer['inputs'] = input_names
-
-    return layer, [shape for shape in input_shapes[0]]
+        outshape = [shape for shape in input_shapes[0]]
+    return layer, outshape
 
 def register_lambda_layer():
     # Register the converter for custom Keras layer
