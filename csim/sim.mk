@@ -50,7 +50,6 @@ CXX_FLAGS += -D__WEIGHTS_DIR__=$(WEIGHTS_DIR)
 
 LD_FLAGS :=
 LD_FLAGS += -lm
-LD_FLAGS += -lstdc++fs
 
 LD_LIBS :=
 
@@ -67,10 +66,6 @@ CXX_SOURCES += myproject_test.cpp
 CXX_SOURCES += $(subst $(MODEL_DIR)/firmware/,,$(wildcard $(MODEL_DIR)/firmware/*.cpp))
 
 .SUFFIXES: .cpp .h .o
-
-edit-output-precision:
-	vim ../test_model/firmware/defines.h +118
-.PHONY: edit-output-precision
 
 trim-trailing-space:
 	@echo "INFO: Remove trailing spaces from $(DATA_FILE)"
@@ -90,7 +85,7 @@ $(MODEL): $(CXX_OBJECTS)
 .cpp.o:
 	$(QUIET_CXX)$(CXX) $(CXX_FLAGS) ${INCDIR} -c $<
 
-run: edit-output-precision $(MODEL)
+run: $(MODEL)
 	$(QUIET_RUN)./$(MODEL) | tee run.log
 .PHONY: run
 
