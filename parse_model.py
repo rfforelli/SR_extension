@@ -161,15 +161,13 @@ def parse_model():
 
 
     config = hls4ml.utils.config_from_keras_model (model,
-                                                   default_precision = 'ap_fixed<16,10>',
+                                                   default_precision = 'ap_fixed<32,16,AP_RND_CONV, AP_SAT>',
                                                    granularity = 'name',
                                                    extra_layers=['Lambda'])
 
     config["Model"]['BramFactor'] = 0
     for layer in config["LayerName"]:
         config["LayerName"][layer]['ReuseFactor'] = 32
-        if "relu" in layer:
-            config["LayerName"][layer]["table_t"] = 'ap_fixed<18,12>'
     config["LayerName"]["lambda_2"]["Precision"] = 'ap_ufixed<8,8,AP_RND_CONV, AP_SAT>'
     print(config)
 
