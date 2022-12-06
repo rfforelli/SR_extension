@@ -166,7 +166,7 @@ def parse_model():
 
 
     config = hls4ml.utils.config_from_keras_model (model,
-                                                   default_precision = 'ap_fixed<16,6>',
+                                                   default_precision = 'ap_fixed<32,16,AP_RND_CONV, AP_SAT>',
                                                    granularity = 'name',
                                                    extra_layers=['Lambda'])
 
