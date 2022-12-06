@@ -4,11 +4,13 @@ import tensorflow as tf
 import hls4ml
 from pathlib import Path
 
+from qkeras.utils import _add_supported_quantized_objects
+
 test_root_path = Path(__file__).parent
 
 import solvers.networks.base7
 
-MODEL = "../SR_Mobile_Quantization/experiment/base7_D4C28_bs16ps64_lr1e-3/best_status"
+MODEL = "../SR_Mobile_Quantization/experiment/base7_qkeras_D4C28_bs16ps64_lr1e-3/best_status"
 
 
 # DEPTH_TO_SPACE
@@ -156,12 +158,15 @@ def register_lambda_layer():
 def parse_model():
     register_lambda_layer()
 
-    model = tf.keras.models.load_model(MODEL)
+    co = {}
+    _add_supported_quantized_objects(co)
+
+    model = tf.keras.models.load_model(MODEL, custom_objects=co)
     model.summary()
 
 
     config = hls4ml.utils.config_from_keras_model (model,
-                                                   default_precision = 'ap_fixed<32,16,AP_RND_CONV, AP_SAT>',
+                                                   default_precision = 'ap_fixed<16,6>',
                                                    granularity = 'name',
                                                    extra_layers=['Lambda'])
 
