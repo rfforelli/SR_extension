@@ -164,24 +164,36 @@ def parse_model():
     model = tf.keras.models.load_model(MODEL, custom_objects=co)
     model.summary()
 
-
     config = hls4ml.utils.config_from_keras_model (model,
-                                                   default_precision = 'ap_fixed<32,16,AP_RND_CONV, AP_SAT>',
+                                                   default_precision = 'ap_fixed<16,10>',
                                                    granularity = 'name',
                                                    extra_layers=['Lambda'])
 
     config["Model"]['BramFactor'] = 0
     for layer in config["LayerName"]:
         config["LayerName"][layer]['ReuseFactor'] = 32
+    config["LayerName"]["input_1"]["Precision"] = 'ap_uint<8>'
+    config["LayerName"]["clone_input_1"] = {}
+    config["LayerName"]["clone_input_1"]["Precision"] = 'ap_uint<8>'
     config["LayerName"]["lambda_2"]["Precision"] = 'ap_ufixed<8,8,AP_RND_CONV, AP_SAT>'
+    config['Flows'] = ['vivado:fifo_depth_optimization']
+
     print(config)
+
+    # hls4ml.model.optimizer.get_optimizer('output_rounding_saturation_mode').configure(layers=activations,
+    #     rounding_mode='AP_RND_CONV', saturation_mode='AP_SAT')
 
     hls_model = hls4ml.converters.convert_from_keras_model(model,
                                                            hls_config = config,
                                                            io_type = 'io_stream',
-                                                           output_dir = 'test_model'
+                                                           output_dir = 'test_model_int8',
+                                                           input_data_tb=str(test_root_path / "csim/tb_data/tb_input_features.dat"),
+                                                           output_data_tb=str(test_root_path / "csim/tb_data/tb_output_predictions.dat")
                                                            )
+
+
     hls_model.compile()
+    #hls_model.build(csim=False)
 
 if __name__ == "__main__":
     parse_model()
