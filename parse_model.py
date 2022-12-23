@@ -10,7 +10,9 @@ test_root_path = Path(__file__).parent
 
 import solvers.networks.base7
 
-MODEL = "../SR_Mobile_Quantization/experiment/base7_qkeras_D4C28_bs16ps64_lr1e-3/best_status"
+BITS = "5b"
+
+MODEL = f"../SR_Mobile_Quantization/experiment/base7_qkeras_{BITS}_D4C28_bs16ps64_lr1e-3/best_status"
 
 
 # DEPTH_TO_SPACE
@@ -99,7 +101,7 @@ class UpsampleFunctionTemplate(hls4ml.backends.template.FunctionCallTemplate):
         return self.template.format(**params)
 
 
-def parse_lambda_layer(keras_layer, input_names, input_shapes, data_reader, config):
+def parse_lambda_layer(keras_layer, input_names, input_shapes, data_reader):
     layer = {}
     layer['name'] = keras_layer['config']['name']
     layer['n_in'] = input_shapes[0][1]
@@ -166,8 +168,7 @@ def parse_model():
 
     config = hls4ml.utils.config_from_keras_model (model,
                                                    default_precision = 'ap_fixed<16,10>',
-                                                   granularity = 'name',
-                                                   extra_layers=['Lambda'])
+                                                   granularity = 'name')
 
     #strategy = "Latency"
     strategy = "Resource"
@@ -192,7 +193,7 @@ def parse_model():
     hls_model = hls4ml.converters.convert_from_keras_model(model,
                                                            hls_config = config,
                                                            io_type = 'io_stream',
-                                                           output_dir = f'test_model_{strategy}_rf{rf}_fifo',
+                                                           output_dir = f'test_model_{BITS}_{strategy}_rf{rf}_fifo',
                                                            input_data_tb=str(test_root_path / "csim/tb_data/tb_input_features.dat"),
                                                            output_data_tb=str(test_root_path / "csim/tb_data/tb_output_predictions.dat"),
                                                            part='xcvu9p-flgc2104-2L-e'
