@@ -4,15 +4,11 @@ import tensorflow as tf
 import hls4ml
 from pathlib import Path
 
-from qkeras.utils import _add_supported_quantized_objects
-
 test_root_path = Path(__file__).parent
 
 import solvers.networks.base7
 
-BITS = "5b"
-
-MODEL = f"../SR_Mobile_Quantization/experiment/base7_qkeras_{BITS}_D4C28_bs16ps64_lr1e-3/best_status"
+MODEL = "../SR_Mobile_Quantization/experiment/base7_D4C28_bs16ps64_lr1e-3/best_status"
 
 
 # DEPTH_TO_SPACE
@@ -160,10 +156,7 @@ def register_lambda_layer():
 def parse_model():
     register_lambda_layer()
 
-    co = {}
-    _add_supported_quantized_objects(co)
-
-    model = tf.keras.models.load_model(MODEL, custom_objects=co)
+    model = tf.keras.models.load_model(MODEL)
     model.summary()
 
     config = hls4ml.utils.config_from_keras_model (model,
@@ -179,9 +172,8 @@ def parse_model():
     for layer in config["LayerName"]:
         config["LayerName"][layer]['ReuseFactor'] = rf
         config["LayerName"][layer]["Strategy"] = strategy
-    config["LayerName"]["input_1"]["Precision"] = 'ap_uint<8>'
-    config["LayerName"]["clone_input_1"] = {}
-    config["LayerName"]["clone_input_1"]["Precision"] = 'ap_uint<8>'
+        if "relu" in layer:
+            config["LayerName"][layer]["table_t"] = 'ap_fixed<18,12>'
     config["LayerName"]["lambda_2"]["Precision"] = 'ap_ufixed<8,8,AP_RND_CONV, AP_SAT>'
 
     # # Uncomment if you want to do fifo depth otpimization
@@ -192,7 +184,7 @@ def parse_model():
     hls_model = hls4ml.converters.convert_from_keras_model(model,
                                                            hls_config = config,
                                                            io_type = 'io_stream',
-                                                           output_dir = f'test_model_{BITS}_{strategy}_rf{rf}',
+                                                           output_dir = f'test_model_noqkeras_{strategy}_rf{rf}',
                                                            input_data_tb=str(test_root_path / "csim/tb_data/tb_input_features.dat"),
                                                            output_data_tb=str(test_root_path / "csim/tb_data/tb_output_predictions.dat"),
                                                            part='xcvu9p-flgc2104-2L-e'
