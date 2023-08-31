@@ -10,9 +10,9 @@ test_root_path = Path(__file__).parent
 
 import solvers.networks.base7
 
-BITS = "5b"
+BITS = "8b"
 
-MODEL = f"../SR_Mobile_Quantization/experiment/base7_qkeras_{BITS}_D4C28_bs16ps64_lr1e-3/best_status"
+MODEL = f"./experiment/base7_qkeras_{BITS}_D4C28_bs16ps64_lr1e-3/best_status"
 
 
 # DEPTH_TO_SPACE
@@ -156,6 +156,7 @@ def register_lambda_layer():
 
     backend.register_source(test_root_path / "lambda_cpp/nnet_depthtospace_stream.h")
     backend.register_source(test_root_path / "lambda_cpp/nnet_upsample_stream.h")
+    print(test_root_path)
 
 def parse_model():
     register_lambda_layer()
@@ -183,23 +184,25 @@ def parse_model():
     config["LayerName"]["clone_input_1"] = {}
     config["LayerName"]["clone_input_1"]["Precision"] = 'ap_uint<8>'
     config["LayerName"]["lambda_2"]["Precision"] = 'ap_ufixed<8,8,AP_RND_CONV, AP_SAT>'
-
-    # # Uncomment if you want to do fifo depth otpimization
     # config['Flows'] = ['vivado:fifo_depth_optimization']
 
     print(config)
 
+    # hls4ml.model.optimizer.get_optimizer('output_rounding_saturation_mode').configure(layers=activations,
+    #     rounding_mode='AP_RND_CONV', saturation_mode='AP_SAT')
+
     hls_model = hls4ml.converters.convert_from_keras_model(model,
                                                            hls_config = config,
                                                            io_type = 'io_stream',
-                                                           output_dir = f'test_model_{BITS}_{strategy}_rf{rf}',
+                                                           output_dir = f'test_model_{BITS}_{strategy}_rf{rf}_nofifo_test',
                                                            input_data_tb=str(test_root_path / "csim/tb_data/tb_input_features.dat"),
                                                            output_data_tb=str(test_root_path / "csim/tb_data/tb_output_predictions.dat"),
                                                            part='xcvu9p-flgc2104-2L-e'
                                                            )
 
+
     hls_model.compile()
-    hls_model.build(csim=False)
+    hls_model.build(csim=False, synth=True, cosim=False, validation=False, vsynth=False, export=False)
 
 if __name__ == "__main__":
     parse_model()

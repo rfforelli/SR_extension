@@ -12,6 +12,6 @@ dependencies:
     - jupyter
     - tensorflow==2.9.1
     - tensorflow_datasets
-    - git+https://github.com/jmitrevs/hls4ml.git@extensions-config#egg=hls4ml[profiling]
+    - git+https://github.com/rfforelli/hls4ml_accum_concat.git@main#egg=hls4ml[profiling]
     - qkeras==0.9.0
     - scikit-learn
